@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: synapse-backend
+    env: node
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    rootDir: .
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGODB_URI
+        fromDatabase:
+          name: synapse-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: https://synapse-frontend.onrender.com
+
+  - type: static
+    name: synapse-frontend
+    env: node
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/build
+    rootDir: .
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://synapse-backend.onrender.com/api
+
+databases:
+  - name: synapse-db
+    databaseName: synapse
+    user: synapse
